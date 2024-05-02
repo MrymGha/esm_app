@@ -1,0 +1,93 @@
+{% set year = 2024 %}
+{% set month = 4 %}
+{# April #}
+
+{# Generate the first day of the month #}
+{% set startDate = date(year ~ '-' ~ month ~ '-01') %}
+
+{# Generate the last day of the month #}
+{% set endDate = date(year ~ '-' ~ month ~ '-' ~ startDate|date('t')) %}
+
+{% extends 'base.html.twig' %}
+	{% block body %}
+		<h1>
+	Emploi Du Temps
+	</h1>
+
+		{% if timeSlots is empty %}
+			<p>
+		No data found.
+		</p>
+	{% else %}
+		<div class="swiper mySwiper">
+			<div class="swiper-wrapper">
+				{% set currentDay = 1 %}
+				{% set currentDate = startDate %}
+
+				{% for tableIndex in range(1, 5) %}
+					<div class="swiper-slide">
+						<table id="timetable{{ tableIndex }}">
+							<thead>
+								<tr>
+									<td colspan="8">{{ startDate|date('F') }}
+										Week
+										{{ tableIndex }}</td>
+								</tr>
+								<tr>
+									<th>Time</th>
+									{% for day in range(1, 7) %}
+										<th>{{ startDate|date('D, j') }}</th>
+										{% set startDate = startDate|date_modify('+1 day') %}
+									{% endfor %}
+								</tr>
+							</thead>
+							<tbody>
+								{% for timeSlot in timeSlots %}
+									<tr>
+										<td>{{ timeSlot }}</td>
+										{% set currentDate = startDate %}
+										{% for dayIndex in range(1, 7) %}
+											{% if currentDate <= endDate %}
+												<td class="type">
+													<input type="text" name="click" class="data-input">
+												</td>
+											{% endif %}
+											{% set currentDate = currentDate|date_modify('+1 day') %}
+										{% endfor %}
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="swiper-pagination"></div>
+		</div>
+	{% endif %}
+
+	<script>
+		// Get all the <td> elements
+        var tdElements = document.querySelectorAll('td.type');
+
+        // Add event listener for click on <td>
+        tdElements.forEach(function (td) {
+            td.addEventListener('click', function () { // Create an input field within the alert
+                var inputField = document.createElement('input');
+                inputField.type = 'text';
+
+                // Show alert with the input field
+                var inputValue = prompt('Enter data:', '');
+                alert("User input: " + inputValue);
+
+                // Get the existing value of the <td> element
+                var existingValue = td.innerText;
+
+                // Concatenate the existing value and the user's input with a comma
+                var newValue = existingValue ? existingValue + ', ' + inputValue : inputValue;
+
+                // Set the new value in the <td> element
+                td.innerText = newValue;
+            });
+        });
+	</script>
+{% endblock %}
