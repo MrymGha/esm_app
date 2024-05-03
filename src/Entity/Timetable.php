@@ -15,53 +15,54 @@ class Timetable
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, seance>
-     */
-    #[ORM\OneToMany(targetEntity: seance::class, mappedBy: 'timetable')]
-    private Collection $seance;
-
-    //#[ORM\ManyToOne(targetEntity:: 'timetables')]
-    //private ?user $user = null;
+    #[ORM\OneToMany(targetEntity: TimetableSession::class, mappedBy: 'timetable')]
+    private $timetableSeances;
 
     public function __construct()
     {
-        $this->seance = new ArrayCollection();
+        $this->timetableSeances = new ArrayCollection();
     }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
+    
     /**
-     * @return Collection<int, seance>
+     * @return Collection|TimetableSession[]
      */
-    public function getSeance(): Collection
+    public function getTimetableSeances(): Collection
     {
-        return $this->seance;
+        return $this->timetableSeances;
     }
 
-    public function addSeance(seance $seance): static
+    public function addTimetableSeances(TimetableSession $timetableSeance): self
     {
-        if (!$this->seance->contains($seance)) {
-            $this->seance->add($seance);
-            $seance->setTimetable($this);
+        if (!$this->timetableSeances->contains($timetableSeance)) {
+            $this->timetableSeances[] = $timetableSeance;
+            $timetableSeance->setTimetable($this);
         }
 
         return $this;
     }
 
-    public function removeSeance(seance $seance): static
+    public function removeTimetableSeancesn(TimetableSession $timetableSeance): self
     {
-        if ($this->seance->removeElement($seance)) {
-            // set the owning side to null (unless already changed)
-            if ($seance->getTimetable() === $this) {
-                $seance->setTimetable(null);
+        if ($this->timetableSeances->removeElement($timetableSeance)) {
+            
+            if ($timetableSeance->getTimetable() === $this) {
+                $timetableSeance->setTimetable(null);
             }
         }
 
         return $this;
     }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+   
+
+   
+   
+   
+
+    
    
 }

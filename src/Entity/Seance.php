@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\SeanceRepository;
+use App\Repository\SessionRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SeanceRepository::class)]
@@ -32,12 +35,13 @@ class Seance
     #[ORM\JoinColumn(nullable: false)]
     private ?salle $salle = null;
 
-    #[ORM\ManyToOne(inversedBy: 'seance')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Timetable $timetable = null;
+    
 
     #[ORM\ManyToOne(targetEntity: 'user')]
     private ?user $user = null;
+
+    #[ORM\OneToMany(targetEntity:TimetableSession::class, mappedBy: "seance")]
+    private  $timetableSeances;
 
     public function getId(): ?int
     {
@@ -104,17 +108,6 @@ class Seance
         return $this;
     }
 
-    public function getTimetable(): ?Timetable
-    {
-        return $this->timetable;
-    }
-
-    public function setTimetable(?Timetable $timetable): static
-    {
-        $this->timetable = $timetable;
-
-        return $this;
-    }
     public function getUser(): ?User
     {
         return $this->user;
@@ -123,6 +116,36 @@ class Seance
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|TimetableSession[]
+     */
+    public function getTimetableSeances(): Collection
+    {
+        return $this->timetableSeances;
+    }
+
+    public function addTimetableSeances(TimetableSession $timetableSeance): self
+    {
+        if (!$this->timetableSeances->contains($timetableSeance)) {
+            $this->timetableSeances[] = $timetableSeance;
+            $timetableSeance->setSeance($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTimetableSeancesn(TimetableSession $timetableSeance): self
+    {
+        if ($this->timetableSeances->removeElement($timetableSeance)) {
+            
+            if ($timetableSeance->getSeance() === $this) {
+                $timetableSeance->setSeance(null);
+            }
+        }
 
         return $this;
     }
